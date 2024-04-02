@@ -20,6 +20,7 @@ export const createPost = async(req: Request, res: Response) => {
         Order,
         wishlist,
         productReview,
+        //
     } = req.body
 
     
