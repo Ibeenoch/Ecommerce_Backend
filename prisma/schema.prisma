@@ -1,0 +1,192 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id                    Int         @id @default(autoincrement())
+  title                 String     
+  description           String
+  price                 Int 
+  discountPercentage    Int
+  rating                Int?
+  stock                 Int?
+  brand                 Brand       @relation(fields: [brandId], references: [id])
+  brandId               Int
+  category              Category    @relation(fields: [categoryId], references: [id])
+  categoryId            Int
+  thumbnail             String
+  keywords              String?
+  images                ProductImage[]
+  CartItem              CartItem[]
+  Order                 Order[]
+  wishlist              WishList[]
+  productReview         ProductReview[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}
+
+model WishList {
+  id            Int         @id @default(autoincrement())
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  product       Product     @relation(fields: [productId], references: [id])
+  productId     Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model ProductReview{
+  id            Int         @id @default(autoincrement())
+  remark        String
+  rating        Int
+  product       Product     @relation(fields: [productId], references: [id])
+  productId     Int
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}
+
+model ProductImage {
+  id                    Int         @id @default(autoincrement())
+  url                   String
+  product               Product     @relation(fields: [productId], references: [id] )
+  productId             Int
+}
+
+model UserImage {
+  id                    Int         @id @default(autoincrement())
+  url                   String
+  user                  User        @relation(fields: [userId], references: [id])
+  userId                Int 
+}
+
+model Cart {
+  id                    Int         @id @default(autoincrement())
+  userId                Int
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  items                 CartItem[]
+}
+
+model CartItem {
+  id                    Int         @id @default(autoincrement())
+  quantity              Int 
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+  product               Product     @relation(fields: [productId], references: [id])
+  productId             Int
+  cart                  Cart        @relation(fields: [cartId], references: [id])
+  cartId                Int
+  
+}
+
+model Order {
+  id                    Int         @id @default(autoincrement())
+  product               Product     @relation(fields: [productId], references: [id])
+  productId             Int
+  user                  User        @relation(fields: [userId], references: [id])
+  userId                Int 
+  address               String
+  status                String
+  totalAmount           Int
+  totalItems            Int
+  payment               Payment[]
+  refunds               Refund[]
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User{
+  id                    Int         @id  @default(autoincrement())
+  fullName              String      
+  email                 String      @unique
+  password              String
+  role                  Role
+  address               String?     
+  phone                 Int?
+  image                 UserImage[]     
+  zipcode               Int?
+  state                 String?     
+  country               String?     
+  city                  String?     
+  Order                 Order[]
+  OrderId               Int
+  payment               Payment[]
+  wishlist              WishList[]
+  notification          Notification[]
+  productReview         ProductReview[]
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+model Notification{
+  id              Int          @id @default(autoincrement())
+  content         String
+  user            User          @relation(fields: [userId], references: [id])
+  userId          Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Refund{
+  id              Int          @id @default(autoincrement())
+  amount          Float
+  reason          String
+  order           Order       @relation(fields: [orderId], references: [id])
+  orderId         Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+enum PaymentStatus{
+  PENDING
+  SUCCESSFUL
+  DECLINE
+}
+
+model Payment{
+  id              Int          @id @default(autoincrement())
+  fee             Float?
+  status          PaymentStatus
+  provider        PaymentProvider     @relation(fields: [PaymentProviderId], references: [id])
+  PaymentProviderId     Int
+  user            User                @relation(fields: [userId], references: [id])
+  userId          Int
+  order           Order               @relation(fields: [orderId], references: [id])
+  orderId         Int 
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+}
+
+model PaymentProvider{
+  id              Int          @id @default(autoincrement())
+  payment         Payment[]
+  description     String
+}
+
+model Category{
+  id                    Int         @id  @default(autoincrement())
+  name                  String
+  products              Product[]
+}
+
+model Brand{
+  id                    Int         @id  @default(autoincrement())
+  name                  String
+  products              Product[]
+}
