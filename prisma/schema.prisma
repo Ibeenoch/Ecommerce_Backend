@@ -11,27 +11,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
+
 model Product {
   id                    Int         @id @default(autoincrement())
   title                 String     
   description           String
   price                 Int 
   discountPercentage    Int
-  rating                Int?
-  stock                 Int?
-  brand                 Brand       @relation(fields: [brandId], references: [id])
-  brandId               Int
-  category              Category    @relation(fields: [categoryId], references: [id])
-  categoryId            Int
-  thumbnail             String
+  rating                Int?         @default(0)
+  stock                 Int
+  brand                 Brand?       @relation(fields: [brandId], references: [id], onUpdate: Cascade)
+  brandId               Int?
+  category              Category?    @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
+  categoryId            Int?
+  thumbnail             Json
   keywords              String?
-  images                ProductImage[]
   CartItem              CartItem[]
   Order                 Order[]
   wishlist              WishList[]
   productReview         ProductReview[]
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
+  images                Json?
 }
 
 model WishList {
@@ -56,19 +58,7 @@ model ProductReview{
   updatedAt             DateTime    @updatedAt
 }
 
-model ProductImage {
-  id                    Int         @id @default(autoincrement())
-  url                   String
-  product               Product     @relation(fields: [productId], references: [id] )
-  productId             Int
-}
 
-model UserImage {
-  id                    Int         @id @default(autoincrement())
-  url                   String
-  user                  User        @relation(fields: [userId], references: [id])
-  userId                Int 
-}
 
 model Cart {
   id                    Int         @id @default(autoincrement())
@@ -89,6 +79,12 @@ model CartItem {
   cartId                Int
   
 }
+enum Status {
+  PENDING
+  SHIPPED
+  DELIVERED
+  DECLINED
+}
 
 model Order {
   id                    Int         @id @default(autoincrement())
@@ -97,7 +93,7 @@ model Order {
   user                  User        @relation(fields: [userId], references: [id])
   userId                Int 
   address               String
-  status                String
+  status                Status
   totalAmount           Int
   totalItems            Int
   payment               Payment[]
@@ -116,10 +112,10 @@ model User{
   fullName              String      
   email                 String      @unique
   password              String
-  role                  Role
+  role                  Role         @default(USER)
   address               String?     
   phone                 Int?
-  image                 UserImage[]     
+  image                 Json?     
   zipcode               Int?
   state                 String?     
   country               String?     
@@ -181,12 +177,12 @@ model PaymentProvider{
 
 model Category{
   id                    Int         @id  @default(autoincrement())
-  name                  String
+  name                  String      @unique
   products              Product[]
 }
 
 model Brand{
   id                    Int         @id  @default(autoincrement())
-  name                  String
+  name                  String       @unique
   products              Product[]
 }
