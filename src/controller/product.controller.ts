@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
 import { imageUploader } from "../middleware/cloudinary";
-import fs from "fs";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
+    console.log('request files', req.files)
     const allImages = JSON.parse(JSON.stringify(req.files));
 
     const { brand, category } = req.body;
@@ -178,7 +178,12 @@ export const deleteProduct = async (req: Request, res: Response) => {
 
 export const getAllProduct = async (req: Request, res: Response) => {
   try {
-    const product = await prisma.product.findMany();
+    const product = await prisma.product.findMany({
+      include: {
+        brand: true,
+        category: true,
+      }
+    });
     console.log("all product fetched ", product);
     res.status(200).json(product);
   } catch (error) {
@@ -191,10 +196,86 @@ export const getAProduct = async (req: Request, res: Response) => {
     const product = await prisma.product.findUnique({
       where: {
         id: parseInt(req.params.id)
+      }, 
+      include: {
+        brand: true,
+        category: true
       }
     })
     console.log("all product fetched ", product);
     res.status(200).json(product);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const sortProductAscending = async (req: Request, res: Response) => {
+  try {
+    const sortedAllProduct = await prisma.product.findMany({
+      orderBy: {
+        price: 'asc'
+      },
+      include: {
+        brand: true,
+        category: true,
+      }
+    })
+    console.log("all product fetched asc", sortedAllProduct);
+    res.status(200).json(sortedAllProduct);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const sortProductDescending = async (req: Request, res: Response) => {
+  try {
+    const sortedAllProduct = await prisma.product.findMany({
+      orderBy: {
+        price: 'desc'
+      },
+      include: {
+        brand: true,
+        category: true,
+      }
+    })
+    console.log("all product fetched desc ", sortedAllProduct);
+    res.status(200).json(sortedAllProduct);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const sortProductNewest = async (req: Request, res: Response) => {
+  try {
+    const sortedAllProduct = await prisma.product.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
+      include: {
+        brand: true,
+        category: true,
+      }
+    })
+    console.log("all product fetched desc ", sortedAllProduct);
+    res.status(200).json(sortedAllProduct);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const sortProductBestRating = async (req: Request, res: Response) => {
+  try {
+    const sortedAllProduct = await prisma.product.findMany({
+      orderBy: {
+        rating: 'desc'
+      },
+      include: {
+        brand: true,
+        category: true,
+      }
+    })
+    console.log("all product fetched desc ", sortedAllProduct);
+    res.status(200).json(sortedAllProduct);
   } catch (error) {
     console.log(error);
   }

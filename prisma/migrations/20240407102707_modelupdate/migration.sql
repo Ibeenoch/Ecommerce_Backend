@@ -2,10 +2,10 @@
 CREATE TABLE `Product` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NOT NULL,
+    `description` LONGTEXT NOT NULL,
     `price` INTEGER NOT NULL,
     `discountPercentage` INTEGER NOT NULL,
-    `rating` INTEGER NULL DEFAULT 0,
+    `rating` JSON NULL,
     `stock` INTEGER NOT NULL,
     `brandId` INTEGER NULL,
     `categoryId` INTEGER NULL,
@@ -94,6 +94,7 @@ CREATE TABLE `User` (
     `country` VARCHAR(191) NULL,
     `city` VARCHAR(191) NULL,
     `OrderId` INTEGER NOT NULL,
+    `RecentViewed` JSON NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
 

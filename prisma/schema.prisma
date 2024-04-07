@@ -16,10 +16,10 @@ datasource db {
 model Product {
   id                    Int         @id @default(autoincrement())
   title                 String     
-  description           String
+  description           String      @db.LongText()
   price                 Int 
   discountPercentage    Int
-  rating                Int?         @default(0)
+  rating                Json?         
   stock                 Int
   brand                 Brand?       @relation(fields: [brandId], references: [id], onUpdate: Cascade)
   brandId               Int?
@@ -122,6 +122,7 @@ model User{
   city                  String?     
   Order                 Order[]
   OrderId               Int
+  RecentViewed          Json?
   payment               Payment[]
   wishlist              WishList[]
   notification          Notification[]
