@@ -121,8 +121,9 @@ model User{
   country               String?     
   city                  String?     
   Order                 Order[]
-  OrderId               Int
+  OrderId               Int?
   RecentViewed          Json?
+  isVerified            Boolean         @default(false)
   payment               Payment[]
   wishlist              WishList[]
   notification          Notification[]

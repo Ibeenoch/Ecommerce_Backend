@@ -2,18 +2,18 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient()
-export const getAllCategories = async(req: Request, res: Response): Promise<void> => {
+export const getAllBrands = async(req: Request, res: Response): Promise<void> => {
     try {
-        const categories = await prisma.category.findMany();
-        console.log('backend categries ', categories)
-        res.status(200).json(categories)
+        const brands = await prisma.brand.findMany();
+        console.log('backend brands ', brands)
+        res.status(200).json(brands)
     } catch (error) {
         console.log(error)
     }
 }
-export const getProductByCategory = async(req: Request, res: Response): Promise<void> => {
+export const getProductByBrand = async(req: Request, res: Response): Promise<void> => {
     try {
-        const category = await prisma.category.findUnique({
+        const category = await prisma.brand.findUnique({
             where: {
                 name: req.params.name
             },
@@ -21,7 +21,7 @@ export const getProductByCategory = async(req: Request, res: Response): Promise<
                 products: true
             }
         });
-        console.log('backend category ', category)
+        console.log('backend brand: ', category)
         res.status(200).json(category)
     } catch (error) {
         console.log(error)

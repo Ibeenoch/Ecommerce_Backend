@@ -3,7 +3,7 @@ import { imageUploader } from "../middleware/cloudinary";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     console.log('request files', req.files)
     const allImages = JSON.parse(JSON.stringify(req.files));
@@ -73,7 +73,7 @@ export const createProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
    if(req.files){
     console.log("req.body: ", req.file, req.files, req.body);
@@ -160,7 +160,7 @@ export const updateProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteProduct = async (req: Request, res: Response) => {
+export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
   try {
 
     const productDeleted = await prisma.product.delete({
@@ -176,7 +176,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllProduct = async (req: Request, res: Response) => {
+export const getAllProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await prisma.product.findMany({
       include: {
@@ -191,7 +191,7 @@ export const getAllProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const getAProduct = async (req: Request, res: Response) => {
+export const getAProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await prisma.product.findUnique({
       where: {
@@ -209,7 +209,7 @@ export const getAProduct = async (req: Request, res: Response) => {
   }
 };
 
-export const sortProductAscending = async (req: Request, res: Response) => {
+export const sortProductAscending = async (req: Request, res: Response): Promise<void> => {
   try {
     const sortedAllProduct = await prisma.product.findMany({
       orderBy: {
@@ -227,7 +227,7 @@ export const sortProductAscending = async (req: Request, res: Response) => {
   }
 };
 
-export const sortProductDescending = async (req: Request, res: Response) => {
+export const sortProductDescending = async (req: Request, res: Response): Promise<void> => {
   try {
     const sortedAllProduct = await prisma.product.findMany({
       orderBy: {
@@ -263,7 +263,7 @@ export const sortProductNewest = async (req: Request, res: Response) => {
   }
 };
 
-export const sortProductBestRating = async (req: Request, res: Response) => {
+export const sortProductBestRating = async (req: Request, res: Response): Promise<void> => {
   try {
     const sortedAllProduct = await prisma.product.findMany({
       orderBy: {
