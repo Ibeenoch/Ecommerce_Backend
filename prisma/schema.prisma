@@ -114,7 +114,7 @@ model User{
   password              String
   role                  Role         @default(USER)
   address               String?     
-  phone                 Int?
+  phone                 BigInt?
   image                 Json?     
   zipcode               Int?
   state                 String?     
