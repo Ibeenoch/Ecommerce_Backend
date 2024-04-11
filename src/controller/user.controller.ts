@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
 import jwt from 'jsonwebtoken'
+import json from './json.serialised';
 dotenv.config();
 
 const prisma = new PrismaClient;
@@ -245,6 +246,7 @@ export const verifyEmail = async(req: Request, res: Response) => {
     }
 }
 
+
 export const checkOutInfo = async(req: Request, res: Response) => {
     try {
         console.log(req.body)
@@ -254,16 +256,16 @@ export const checkOutInfo = async(req: Request, res: Response) => {
             },
             data: {
                 fullName: req.body.fullName,
-                phone: parseInt(req.body.phone),
+                phone: BigInt(parseInt(req.body.phone)),
                 address: req.body.street,
                 city: req.body.city,
                 country: req.body.country,
                 state: req.body.state,
-                zipcode: parseInt(req.body.zipCode),
+                zipcode: parseInt(req.body.zipcode),
             }
         })
 
-        res.status(200).json(user);
+        res.status(200).type("json").send(json(user));
         
     } catch (error) {
         console.log(error)

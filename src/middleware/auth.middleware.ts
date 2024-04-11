@@ -32,11 +32,15 @@ export const protect = async(req: Request, res: Response, next: NextFunction) =>
     }
 }
 
+console.log('middleware')
+
 export const protectAdmin = async(req: Request, res: Response, next: NextFunction) => {
+    console.log( req.headers.authorization)
     let token;
     try {
        token  = req.headers && req.headers.authorization && req.headers.authorization.split(' ')[1]
         if(token){
+            console.log('token ', token, ' req.head ', req.headers.authorization)
             const decode = jwt.verify(token, process.env.JWTTOKEN as any)as { id: any};
             const reqUser = await prisma.user.findUnique({
                 where: {

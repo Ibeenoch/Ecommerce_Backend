@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('request files', req.files)
+    // console.log('request files', req.files)
     const allImages = JSON.parse(JSON.stringify(req.files));
 
     const { brand, category } = req.body;
@@ -65,7 +65,7 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
       },
     } as any);
 
-    console.log("newProduct:  ", productcreated);
+    // console.log("newProduct:  ", productcreated);
     res.status(201).json(productcreated);
   } catch (error) {
     console.log(error);
@@ -75,8 +75,9 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
 
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
+    console.log('body send: ', req.files)
    if(req.files){
-    console.log("req.body: ", req.file, req.files, req.body);
+    console.log("req.body with img: ");
     const allImages = JSON.parse(JSON.stringify(req.files));
 
     const { brand, category } = req.body;
@@ -89,7 +90,6 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
     }
 
     const imgs = JSON.parse(JSON.stringify(urls));
-    console.log(imgs);
     const firstImage = {
       url: imgs[0].url,
       public_id: imgs[0].public_id,
@@ -110,7 +110,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
         description: req.body.description || findProduct?.description,
         stock: parseInt(req.body.stock) || findProduct?.stock,
         price: parseInt(req.body.price) || findProduct?.price,
-        discountPercentage: req.body.discountPercentage || findProduct?.discountPercentage,
+        discountPercentage: parseInt(req.body.discountPercentage) || findProduct?.discountPercentage,
         thumbnail: firstImage || findProduct?.thumbnail,
         keywords: req.body.keywords || findProduct?.keywords,
         images: {
@@ -122,10 +122,10 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
       }
     });
 
-    console.log("updatedProduct:  ", updateProduct);
-    res.status(200).json(updateProduct);
+    console.log("updatedProduct:  ", updateproduct);
+    res.status(200).json(updateproduct);
    }else{
-    console.log("req.body: ", req.body);
+    console.log("req.body without img: ", );
 
     const { brand, category } = req.body;
 
@@ -150,7 +150,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
       }
     });
 
-    console.log("updatedProduct:  ", updateProduct);
+    console.log("updatedProduct without img:  ", updateProduct);
     res.status(200).json(updateProduct);
 
    }
@@ -161,6 +161,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
 };
 
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
+  console.log('deleted pro body ', req.body)
   try {
 
     const productDeleted = await prisma.product.delete({
@@ -168,7 +169,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
         id: parseInt(req.params.id)
       }
     })
-    console.log("product deleted:  ", productDeleted);
+    console.log("product deleted:  ");
     res.status(201).json(productDeleted);
   } catch (error) {
     console.log(error);
@@ -184,7 +185,7 @@ export const getAllProduct = async (req: Request, res: Response): Promise<void> 
         category: true,
       }
     });
-    console.log("all product fetched ", product);
+    // console.log("all product fetched ", product);
     res.status(200).json(product);
   } catch (error) {
     console.log(error);
@@ -202,7 +203,7 @@ export const getAProduct = async (req: Request, res: Response): Promise<void> =>
         category: true
       }
     })
-    console.log("all product fetched ", product);
+    // console.log("all product fetched ", product);
     res.status(200).json(product);
   } catch (error) {
     console.log(error);
@@ -220,7 +221,7 @@ export const sortProductAscending = async (req: Request, res: Response): Promise
         category: true,
       }
     })
-    console.log("all product fetched asc", sortedAllProduct);
+    // console.log("all product fetched asc", sortedAllProduct);
     res.status(200).json(sortedAllProduct);
   } catch (error) {
     console.log(error);
@@ -238,7 +239,7 @@ export const sortProductDescending = async (req: Request, res: Response): Promis
         category: true,
       }
     })
-    console.log("all product fetched desc ", sortedAllProduct);
+    // console.log("all product fetched desc ", sortedAllProduct);
     res.status(200).json(sortedAllProduct);
   } catch (error) {
     console.log(error);
@@ -256,7 +257,7 @@ export const sortProductNewest = async (req: Request, res: Response) => {
         category: true,
       }
     })
-    console.log("all product fetched desc ", sortedAllProduct);
+    // console.log("all product fetched desc ", sortedAllProduct);
     res.status(200).json(sortedAllProduct);
   } catch (error) {
     console.log(error);
@@ -274,7 +275,7 @@ export const sortProductBestRating = async (req: Request, res: Response): Promis
         category: true,
       }
     })
-    console.log("all product fetched desc ", sortedAllProduct);
+    // console.log("all product fetched desc ", sortedAllProduct);
     res.status(200).json(sortedAllProduct);
   } catch (error) {
     console.log(error);

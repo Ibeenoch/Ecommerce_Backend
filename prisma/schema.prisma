@@ -28,7 +28,6 @@ model Product {
   thumbnail             Json
   keywords              String?
   CartItem              CartItem[]
-  Order                 Order[]
   wishlist              WishList[]
   productReview         ProductReview[]
   createdAt             DateTime    @default(now())
@@ -88,14 +87,11 @@ enum Status {
 
 model Order {
   id                    Int         @id @default(autoincrement())
-  product               Product     @relation(fields: [productId], references: [id])
-  productId             Int
+  productDetails        Json
+  shippingDetails        Json?
   user                  User        @relation(fields: [userId], references: [id])
   userId                Int 
-  address               String
-  status                Status
-  totalAmount           Int
-  totalItems            Int
+  status                Status?     @default(PENDING)
   payment               Payment[]
   refunds               Refund[]
   createdAt             DateTime    @default(now())
@@ -159,23 +155,16 @@ enum PaymentStatus{
 
 model Payment{
   id              Int          @id @default(autoincrement())
-  fee             Float?
+  paymentDetails  Json
   status          PaymentStatus
-  provider        PaymentProvider     @relation(fields: [PaymentProviderId], references: [id])
-  PaymentProviderId     Int
-  user            User                @relation(fields: [userId], references: [id])
-  userId          Int
-  order           Order               @relation(fields: [orderId], references: [id])
-  orderId         Int 
+  user            User?               @relation(fields: [userId], references: [id])
+  userId          Int?
+  order           Order?               @relation(fields: [orderId], references: [id])
+  orderId         Int? 
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
 }
 
-model PaymentProvider{
-  id              Int          @id @default(autoincrement())
-  payment         Payment[]
-  description     String
-}
 
 model Category{
   id                    Int         @id  @default(autoincrement())
