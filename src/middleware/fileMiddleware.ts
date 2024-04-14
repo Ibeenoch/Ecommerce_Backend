@@ -1,5 +1,4 @@
 import multer from "multer";
-console.log('multer')
 //create a storage
 const imageStorage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -11,7 +10,6 @@ const imageStorage = multer.diskStorage({
         cb(null, file.fieldname + '-' + uniqueSuffix);
     } 
 })
-
 const upload = multer({ storage: imageStorage });
 
 export default upload;

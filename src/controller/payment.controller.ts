@@ -46,18 +46,21 @@ res.status(201).type("json").send(json(paymentReceived))
     }
 }
 
-// const details= {
-    
-// amount: 3060
-// charge_response_code : "00"
-// charge_response_message : "Please enter the OTP sent to your mobile number 080****** and email te**@rave**.com"
-// charged_amount : 3060
-// created_at : "2024-04-10T16:14:17.000Z"
-// currency : "NGN"
-// customer : {name: 'ibewunjo enoch', email: 'fredenoch1@gmail.com', phone_number: '7013456692'}
-// flw_ref : "FLW-MOCK-9e826977e2404c3f0181648af2510d18"
-// redirectstatus : undefined
-// status : "successful"
-// transaction_id : 5017067
-// tx_ref : "mx-1712764796787"
-// }
+export const getAlltransactionForAuser = async(req: Request, res: Response) => {
+    try {
+        const transactions = await prisma.payment.findMany({
+            where: {
+                userId: parseInt(req.params.id)
+            },
+            include: {
+                user: true,
+                order: true
+            }
+        })
+
+        res.status(200).type("json").send(json(transactions))
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error})
+    }
+}

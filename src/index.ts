@@ -6,6 +6,7 @@ import categoryRoute from './routes/category.route';
 import brandRoute from './routes/brand.route';
 import userRoute from './routes/user.route';
 import paymentRoute from './routes/payment.route';
+import orderRoute from './routes/order.route';
 dotenv.config();
 
 const app = express();
@@ -16,6 +17,7 @@ app.use(cors());
 
 app.use('/', productRouter)
 app.use('/', categoryRoute)     
+app.use('/', orderRoute)     
 app.use('/', brandRoute)     
 app.use('/', userRoute)     
 app.use('/', paymentRoute)     

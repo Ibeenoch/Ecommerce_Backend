@@ -35,7 +35,7 @@ export const protect = async(req: Request, res: Response, next: NextFunction) =>
 console.log('middleware')
 
 export const protectAdmin = async(req: Request, res: Response, next: NextFunction) => {
-    console.log( req.headers.authorization)
+    console.log( req.headers, req.headers.authorization)
     let token;
     try {
        token  = req.headers && req.headers.authorization && req.headers.authorization.split(' ')[1]

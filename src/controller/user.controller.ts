@@ -3,8 +3,10 @@ import { Request, Response } from "express";
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv'
 import nodemailer from 'nodemailer'
+import cloudinary from 'cloudinary'
 import jwt from 'jsonwebtoken'
 import json from './json.serialised';
+import { imageUploader } from "../middleware/cloudinary";
 dotenv.config();
 
 const prisma = new PrismaClient;
@@ -25,7 +27,7 @@ try {
     })
 
     if(userExist){
-        res.status(409).json({ message: 'user already exist'})
+        res.status(409).send('user already exist')
     }
 
     const saltRound = 10;
@@ -48,7 +50,7 @@ try {
     console.log(newuser)
     const user = {...newuser, token}
     
-    res.status(201).json(user)
+    res.status(201).type("json").send(json(user))
 
     }else{
 
@@ -102,7 +104,7 @@ try {
                   console.log(newuser)
                   const token = generateToken(newuser.id)
                   const user = {...newuser, token}
-                res.status(201).json(user)
+                res.status(201).type("json").send(json(user))
             }
         })
       
@@ -125,21 +127,22 @@ export const login = async(req: Request, res: Response) => {
                 email: req.body.email
             }
         })
-
-        if(!userExist){
-            res.status(400).json({ message: 'user does not exist'})
+        console.log('user exist: ', userExist)
+        if(userExist === null){
+            res.send('user does not exist')
         }
     
         if(userExist){
                 // verfy password 
             const confirmPassword = await bcrypt.compare(password, userExist.password);
             if(!confirmPassword){
-                res.status(400).json({ message: 'password does not match!'})
+                res.send('password does not match!')
             }else{
                 const token = generateToken(userExist.id);
+                console.log(token)
                 const user = {...userExist, token}
                 console.log('user: ', user)
-                res.status(200).json(user)
+                res.status(200).type("json").send(json(user))
             }
         }
         
@@ -169,7 +172,14 @@ export const sendRecoveryPasswordLink = async(req: Request, res: Response) => {
             }
         }));
 
-        const link= `http://localhost:3000/password/change/${email}`
+        const findUser = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        })
+
+
+        const link= `http://localhost:3000/password/change/${findUser?.id}`
         
         const mailOptions = {
             from: 'fredenoch1@gmail.com',
@@ -186,7 +196,7 @@ export const sendRecoveryPasswordLink = async(req: Request, res: Response) => {
             if(error){
                 console.log(error)
             }else{
-                res.status(200).json({message: 'password recovery sent'})
+                res.status(200).type("json").send(json({message: 'password recovery sent'}))
                 console.log(info.response)
             }
         })
@@ -199,24 +209,28 @@ export const sendRecoveryPasswordLink = async(req: Request, res: Response) => {
 
 export const changePassword = async(req: Request, res: Response) => {
     try {
-        const { oldpassword, newpassword1, newpassword2, email } = req.body;
-console.log('email confirm: ', req.body, oldpassword, newpassword1, newpassword2, email)
-        const user = await prisma.user.findUnique({
-            where: {
-                email: email
-            }
-        })
+        const { newpassword1, newpassword2, } = req.body;
+console.log('email confirm: ', req.body,  newpassword1, newpassword2)
+        
 
         const saltRound = 10;
         const salt = bcrypt.genSaltSync(saltRound)
         const hashPassword = await bcrypt.hash(newpassword1, salt);
         
+        const user = await prisma.user.update({
+            where: {
+                id: parseInt(req.params.id)
+            },
+            data: {
+                password: hashPassword
+            }
+        })
 
         if(user){
             const token = generateToken(user.id)
-            user.password = hashPassword;
-            console.log('user that password change: ', user)
-            res.status(200).json({...user, token})
+            console.log('user that password change: ', user);
+            const userData = {...user, token}
+            res.status(200).type("json").send(json(userData))
         }
         
     } catch (error) {
@@ -238,7 +252,7 @@ export const verifyEmail = async(req: Request, res: Response) => {
                 }
             })
 
-            res.status(200).json({ message: 'user is verified', verified})
+            res.status(200).type("json").send(json({ message: 'user is verified', verified}))
         }
     } catch (error) {
         console.log(error)
@@ -250,6 +264,10 @@ export const verifyEmail = async(req: Request, res: Response) => {
 export const checkOutInfo = async(req: Request, res: Response) => {
     try {
         console.log(req.body)
+        if(isNaN(req.body.phone)){
+            res.status(400)
+            throw new Error('Phone is not a number')
+        }
         const user = await prisma.user.update({
             where: {
                 id: parseInt(req.body.id)
@@ -272,3 +290,76 @@ export const checkOutInfo = async(req: Request, res: Response) => {
         res.status(500).json({message: error})        
     }
 }
+
+export const getAUser = async(req: Request, res: Response) => {
+    try {
+        const aUser = await prisma.user.findUnique({
+            where: {
+                id: parseInt(req.params.id)
+            },
+            include: {
+                Order: true,
+                payment: true
+            }
+        })
+        const token =  generateToken(aUser?.id)
+
+        const user = {...aUser, token}
+
+        res.status(200).type("json").send(json(user));
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error})        
+    }
+}
+
+export const getAllUser = async(req: Request, res: Response) => {
+    try {
+        const user = await prisma.user.findMany({
+            include: {
+                Order: true,
+                payment: true,
+            }
+        })
+
+        // res.status(200).type("json").send(json(user));
+        res.status(200).type("json").send(json(user));
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error})        
+    }
+}
+
+export const userImage = async(req: Request, res: Response) => {
+    try {
+        console.log('file uploading: ', req.file)
+       if(req.file){
+        const filePath = await cloudinary.v2.uploader.upload(req.file?.path)
+        const imagelink = {
+            url: filePath.url,
+            public_id: filePath.public_id,
+        }
+        const aUser = await prisma.user.update({
+            where: {
+                id: parseInt(req.params.id)
+            },
+            data: {
+                image: imagelink
+            }
+        })
+
+        console.log('image user uploaded')
+        const token = generateToken(aUser.id)
+        const user = {...aUser, token}
+
+        res.status(200).type("json").send(json(user));
+        
+       }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error})        
+    }
+}
+

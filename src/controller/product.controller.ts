@@ -281,3 +281,24 @@ export const sortProductBestRating = async (req: Request, res: Response): Promis
     console.log(error);
   }
 };
+
+export const paginate = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { limit, currentPage } = req.body;
+    const pageSize = parseInt(limit);
+    const pageNumber = parseInt(currentPage);
+    const skip = (pageNumber - 1 ) * pageSize;
+    const paginatedResult = await prisma.product.findMany({
+      take: pageSize,
+      skip,
+      include: {
+        brand: true,
+        category: true,
+      }
+    })
+    // console.log("all product fetched desc ", sortedAllProduct);
+    res.status(200).json(paginatedResult);
+  } catch (error) {
+    console.log(error);
+  }
+};
