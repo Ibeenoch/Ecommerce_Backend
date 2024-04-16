@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { imageUploader } from "../middleware/cloudinary";
 import { PrismaClient } from "@prisma/client";
+import json from "./json.serialised";
 const prisma = new PrismaClient();
 
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
@@ -282,6 +283,26 @@ export const sortProductBestRating = async (req: Request, res: Response): Promis
   }
 };
 
+export const searchProduct = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const searchQuery = req.query.q as string
+    console.log('qurry result: ' ,req.query)
+    const searchkey = searchQuery.toLowerCase()
+  const searchItems = await prisma.product.findMany({
+    where: {
+      OR: [
+        { title: { contains: `%${searchkey}%`}},
+        { keywords: { contains: `%${searchkey}%`}}
+      ]
+    }
+  })
+    console.log("all product fetched search ", searchItems);
+    res.status(200).json(searchItems);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const paginate = async (req: Request, res: Response): Promise<void> => {
   try {
     const { limit, currentPage } = req.body;
@@ -296,9 +317,56 @@ export const paginate = async (req: Request, res: Response): Promise<void> => {
         category: true,
       }
     })
-    // console.log("all product fetched desc ", sortedAllProduct);
     res.status(200).json(paginatedResult);
   } catch (error) {
     console.log(error);
   }
 };
+
+export const createProductReview = async (req: Request, res: Response): Promise<void> => {
+  try {
+
+    const createproductReview = await prisma.productReview.create({
+      data: {
+        remark: req.body.remark,
+        rating: parseInt(req.body.rating),
+        user: {
+          connect: {
+            id: parseInt(req.body.userId)
+          }
+        },
+        product: {
+          connect: {
+            id: parseInt(req.body.productId)
+          }
+        }
+    },
+    include: {
+      user: true,
+      product: true,
+    }
+  })
+   console.log('created product')
+    res.status(201).type("json").send(json(createproductReview));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const getProductReviews = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('fetching..')
+   const getAllProductReviews = await prisma.productReview.findMany({
+    include: {
+      user: true,
+      product: true,
+    }
+   })
+   console.log('fetched product')
+
+    res.status(200).type("json").send(json(getAllProductReviews));
+  } catch (error) {
+    console.log(error);
+  }
+};
+

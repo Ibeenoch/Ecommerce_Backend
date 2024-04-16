@@ -127,7 +127,7 @@ export const login = async(req: Request, res: Response) => {
                 email: req.body.email
             }
         })
-        console.log('user exist: ', userExist)
+        
         if(userExist === null){
             res.send('user does not exist')
         }
@@ -138,11 +138,27 @@ export const login = async(req: Request, res: Response) => {
             if(!confirmPassword){
                 res.send('password does not match!')
             }else{
-                const token = generateToken(userExist.id);
+                if(userExist.role === 'ADMIN'){
+                    if(!passcode){
+                        res.status(400).send('please provide a passcode')
+                    }else{
+                        if(passcode !== process.env.PASSCODE){
+                            res.status(409).send('wrong passcode')
+                        }else{
+                            const token = generateToken(userExist.id);
+                            console.log(token)
+                            const user = {...userExist, token}
+                            console.log('admin user send: ', )
+                            res.status(200).type("json").send(json(user))
+                        }
+                    }
+                }else{
+                    const token = generateToken(userExist.id);
                 console.log(token)
                 const user = {...userExist, token}
-                console.log('user: ', user)
+                console.log('user send: ', )
                 res.status(200).type("json").send(json(user))
+                }
             }
         }
         
@@ -210,9 +226,6 @@ export const sendRecoveryPasswordLink = async(req: Request, res: Response) => {
 export const changePassword = async(req: Request, res: Response) => {
     try {
         const { newpassword1, newpassword2, } = req.body;
-console.log('email confirm: ', req.body,  newpassword1, newpassword2)
-        
-
         const saltRound = 10;
         const salt = bcrypt.genSaltSync(saltRound)
         const hashPassword = await bcrypt.hash(newpassword1, salt);
@@ -228,7 +241,6 @@ console.log('email confirm: ', req.body,  newpassword1, newpassword2)
 
         if(user){
             const token = generateToken(user.id)
-            console.log('user that password change: ', user);
             const userData = {...user, token}
             res.status(200).type("json").send(json(userData))
         }
@@ -316,14 +328,15 @@ export const getAUser = async(req: Request, res: Response) => {
 
 export const getAllUser = async(req: Request, res: Response) => {
     try {
+        console.log('strat finding')
         const user = await prisma.user.findMany({
             include: {
                 Order: true,
                 payment: true,
             }
         })
+        console.log('all users is fetched')
 
-        // res.status(200).type("json").send(json(user));
         res.status(200).type("json").send(json(user));
         
     } catch (error) {
@@ -334,7 +347,6 @@ export const getAllUser = async(req: Request, res: Response) => {
 
 export const userImage = async(req: Request, res: Response) => {
     try {
-        console.log('file uploading: ', req.file)
        if(req.file){
         const filePath = await cloudinary.v2.uploader.upload(req.file?.path)
         const imagelink = {
@@ -363,3 +375,37 @@ export const userImage = async(req: Request, res: Response) => {
     }
 }
 
+
+export const paginateUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { limit, currentPage } = req.body;
+      const pageSize = parseInt(limit);
+      const pageNumber = parseInt(currentPage);
+      const skip = (pageNumber - 1 ) * pageSize;
+      const paginatedResult = await prisma.user.findMany({
+        take: pageSize,
+        skip,
+        include: {
+          Order: true,
+          payment: true,
+        }
+      })
+      res.status(200).type("json").send(json(paginatedResult));
+    } catch (error) {
+      console.log(error);
+    }
+};
+
+export const deleteAUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      
+      const deletedUser = await prisma.user.delete({
+        where: {
+            id: parseInt(req.params.id)
+        }
+      })
+      res.status(200).type("json").send(json(deletedUser));
+    } catch (error) {
+      console.log(error);
+    }
+};
