@@ -12,7 +12,7 @@ dotenv.config();
 const prisma = new PrismaClient;
 
 const generateToken = (id: any) => {
-    return jwt.sign({id}, process.env.JWTTOKEN as string, { expiresIn: '2d'}) 
+    return jwt.sign({id}, process.env.JWTTOKEN as string, { expiresIn: '2d' }) 
 }
 
 export const register = async(req: Request, res: Response) => {

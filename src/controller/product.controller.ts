@@ -181,6 +181,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
 export const getAllProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await prisma.product.findMany({
+      take: 18,
       include: {
         brand: true,
         category: true,
@@ -323,6 +324,43 @@ export const paginate = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const similarProducts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const categoryTerm =  req.query.q as string;
+    const brandTerm =  req.query.m as string;
+  
+    const similarProduct = await prisma.product.findMany({
+      include: {
+        category: true,
+        brand: true,
+      },
+      where:{
+        OR: [
+          {
+            category: {
+              name: {
+                contains: categoryTerm,
+              }
+            }
+          },
+          {
+            brand:{
+              name: {
+                contains: brandTerm,
+              }
+            }
+          }
+        ]
+      },
+      take: 4,
+    })
+    console.log('similar product: ', similarProduct)
+    res.status(200).json(similarProduct);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createProductReview = async (req: Request, res: Response): Promise<void> => {
   try {
 
@@ -355,18 +393,47 @@ export const createProductReview = async (req: Request, res: Response): Promise<
 
 export const getProductReviews = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('fetching..')
+    console.log('fetching..', req.params)
    const getAllProductReviews = await prisma.productReview.findMany({
+    where: {
+      productId: parseInt(req.params.id)
+    },
     include: {
       user: true,
       product: true,
     }
    })
-   console.log('fetched product')
+   console.log('fetched product', getAllProductReviews)
 
     res.status(200).type("json").send(json(getAllProductReviews));
   } catch (error) {
     console.log(error);
   }
 };
+
+export const updateProductReviews = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log('fetching... ', parseInt(req.body.updatedRating), req.body)
+    if(parseInt(req.body.updatedRating)){
+         const updateProductReview = await prisma.product.update({
+    where: {
+      id: parseInt(req.params.id)
+    },
+    data: {
+      rating: parseInt(req.body.updatedRating)
+    },
+    include: {
+      brand: true,
+      category: true,
+    }
+   })
+
+    res.status(200).type("json").send(json(updateProductReview));
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 

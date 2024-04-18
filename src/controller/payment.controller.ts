@@ -7,26 +7,26 @@ const prisma = new PrismaClient;
 
 export const makePayment = async(req: Request, res: Response) => {
     try {
-        
-        console.log(req.body.user[0].id, req.body.carts)
+        console.log('reqbody: ', req.body)
+        console.log(req.body.user.id, req.body.carts)
         const paymentReceived = await prisma.payment.create({
             data: {
                 paymentDetails: req.body.response,
                 user: {
                     connect: {
-                        id: parseInt(req.body.user[0].id)
+                        id: parseInt(req.body.user.id)
                     }
                 },
                status: 'SUCCESSFUL',
                order: {
                 connectOrCreate: {
                     where: {
-                        id: parseInt(req.body.user[0].id),
+                        id: parseInt(req.body.user.id),
                     },
                     create: {
                         productDetails: req.body.carts,
                         shippingDetails: req.body.shippingDetails,
-                        userId: parseInt(req.body.user[0].id),
+                        userId: parseInt(req.body.user.id),
                     }
                 }
                }

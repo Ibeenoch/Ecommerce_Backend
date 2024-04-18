@@ -20,7 +20,7 @@ model Product {
   description           String      @db.LongText()
   price                 Int 
   discountPercentage    Int
-  rating                Json?         
+  rating                Int?         
   stock                 Int
   brand                 Brand?       @relation(fields: [brandId], references: [id], onUpdate: Cascade)
   brandId               Int?
