@@ -324,6 +324,15 @@ export const paginate = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffledArray = [...array];
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+  }
+  return shuffledArray;
+}
+
 export const similarProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const categoryTerm =  req.query.q as string;
@@ -354,8 +363,9 @@ export const similarProducts = async (req: Request, res: Response): Promise<void
       },
       take: 4,
     })
-    console.log('similar product: ', similarProduct)
-    res.status(200).json(similarProduct);
+    const product = shuffleArray(similarProduct)
+    console.log('similar product: ', product)
+    res.status(200).json(product);
   } catch (error) {
     console.log(error);
   }

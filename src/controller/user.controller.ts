@@ -19,7 +19,6 @@ export const register = async(req: Request, res: Response) => {
 try {
     const { fullname, email, password, confirmPassword, passcode } = req.body;
     console.log(req.body, fullname, email, password, confirmPassword, passcode)
-    //check if the user exist
     const userExist = await prisma.user.findUnique({
         where: {
             email: req.body.email
@@ -121,7 +120,7 @@ export const login = async(req: Request, res: Response) => {
     try {
         const { email, password,  passcode } = req.body;
         console.log(req.body)
-        //check if the user exist
+
         const userExist = await prisma.user.findUnique({
             where: {
                 email: req.body.email
@@ -253,6 +252,8 @@ export const changePassword = async(req: Request, res: Response) => {
 
 export const verifyEmail = async(req: Request, res: Response) => {
     try {
+        console.log('param ', req.params);
+
         const { id } = req.params;
         if(id){
             const verified = await prisma.user.update({
@@ -264,7 +265,10 @@ export const verifyEmail = async(req: Request, res: Response) => {
                 }
             })
 
-            res.status(200).type("json").send(json({ message: 'user is verified', verified}))
+            const token = generateToken(verified.id);
+            const user = {...verified, token};
+            console.log('user verifed', user);
+            res.status(200).type("json").send(json(user))
         }
     } catch (error) {
         console.log(error)
@@ -275,25 +279,28 @@ export const verifyEmail = async(req: Request, res: Response) => {
 
 export const checkOutInfo = async(req: Request, res: Response) => {
     try {
-        console.log(req.body)
+        console.log(req.body.address)
         if(isNaN(req.body.phone)){
             res.status(400)
             throw new Error('Phone is not a number')
         }
-        const user = await prisma.user.update({
+        const theUser = await prisma.user.update({
             where: {
                 id: parseInt(req.body.id)
             },
             data: {
                 fullName: req.body.fullName,
                 phone: BigInt(parseInt(req.body.phone)),
-                address: req.body.street,
+                address: req.body.address,
                 city: req.body.city,
                 country: req.body.country,
                 state: req.body.state,
                 zipcode: parseInt(req.body.zipcode),
             }
-        })
+        });
+
+        const token = generateToken(theUser.id);
+        const user = {...theUser, token}
 
         res.status(200).type("json").send(json(user));
         
@@ -305,6 +312,8 @@ export const checkOutInfo = async(req: Request, res: Response) => {
 
 export const getAUser = async(req: Request, res: Response) => {
     try {
+        console.log('adddd');
+        console.log('aghhjaj, ', req.params )
         const aUser = await prisma.user.findUnique({
             where: {
                 id: parseInt(req.params.id)
@@ -317,7 +326,7 @@ export const getAUser = async(req: Request, res: Response) => {
         const token =  generateToken(aUser?.id)
 
         const user = {...aUser, token}
-
+        console.log('dhadddd');
         res.status(200).type("json").send(json(user));
         
     } catch (error) {
@@ -369,6 +378,16 @@ export const userImage = async(req: Request, res: Response) => {
         res.status(200).type("json").send(json(user));
         
        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: error})        
+    }
+}
+
+export const updateProfile = async(req: Request, res: Response) => {
+    try {
+      
+
     } catch (error) {
         console.log(error)
         res.status(500).json({message: error})        

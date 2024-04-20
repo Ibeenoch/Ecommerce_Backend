@@ -6,6 +6,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const protect = async(req: Request, res: Response, next: NextFunction) => {
+    console.log('req ', req.headers)
     let token;
     try {
        token  = req.headers && req.headers.authorization && req.headers.authorization.split(' ')[1]

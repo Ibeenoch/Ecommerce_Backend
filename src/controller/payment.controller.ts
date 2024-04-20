@@ -66,6 +66,27 @@ export const getAlltransactionForAuser = async(req: Request, res: Response) => {
     }
 }
 
+export const getAtransactionOfAuser = async(req: Request, res: Response) => {
+    try {
+        console.log(req.params)
+        const transaction = await prisma.payment.findUnique({
+            where: {
+                id: parseInt(req.params.id),
+                userId: parseInt(req.params.userId)
+            },
+            include: {
+                user: true,
+                order: true
+            }
+        })
+
+        res.status(200).type("json").send(json(transaction))
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ message: error})
+    }
+}
+
 export const getAlltransactions = async(req: Request, res: Response) => {
     try {
         const transactions = await prisma.payment.findMany({
