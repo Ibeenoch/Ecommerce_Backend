@@ -6,7 +6,6 @@ const prisma = new PrismaClient();
 
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    // console.log('request files', req.files)
     const allImages = JSON.parse(JSON.stringify(req.files));
 
     const { brand, category } = req.body;
@@ -66,7 +65,6 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
       },
     } as any);
 
-    // console.log("newProduct:  ", productcreated);
     res.status(201).json(productcreated);
   } catch (error) {
     console.log(error);
@@ -76,9 +74,8 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
 
 export const updateProduct = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log('body send: ', req.files)
    if(req.files){
-    console.log("req.body with img: ");
+
     const allImages = JSON.parse(JSON.stringify(req.files));
 
     const { brand, category } = req.body;
@@ -123,7 +120,6 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
       }
     });
 
-    console.log("updatedProduct:  ", updateproduct);
     res.status(200).json(updateproduct);
    }else{
     console.log("req.body without img: ", );
@@ -151,7 +147,6 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
       }
     });
 
-    console.log("updatedProduct without img:  ", updateProduct);
     res.status(200).json(updateProduct);
 
    }
@@ -248,7 +243,7 @@ export const sortProductDescending = async (req: Request, res: Response): Promis
   }
 };
 
-export const sortProductNewest = async (req: Request, res: Response) => {
+export const sortProductNewest = async (req: Request, res: Response): Promise<void> => {
   try {
     const sortedAllProduct = await prisma.product.findMany({
       orderBy: {

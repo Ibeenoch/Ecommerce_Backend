@@ -5,7 +5,7 @@ import json from './json.serialised'
 const prisma = new PrismaClient;
 
 
-export const makePayment = async(req: Request, res: Response) => {
+export const makePayment = async(req: Request, res: Response): Promise<void> => {
     try {
         console.log('reqbody: ', req.body)
         console.log(req.body.user.id, req.body.carts)
@@ -47,7 +47,7 @@ res.status(201).type("json").send(json(paymentReceived))
     }
 }
 
-export const getAlltransactionForAuser = async(req: Request, res: Response) => {
+export const getAlltransactionForAuser = async(req: Request, res: Response): Promise<void> => {
     try {
         const transactions = await prisma.payment.findMany({
             where: {
@@ -66,7 +66,7 @@ export const getAlltransactionForAuser = async(req: Request, res: Response) => {
     }
 }
 
-export const getAtransactionOfAuser = async(req: Request, res: Response) => {
+export const getAtransactionOfAuser = async(req: Request, res: Response): Promise<void> => {
     try {
         console.log(req.params)
         const transaction = await prisma.payment.findUnique({
@@ -87,7 +87,7 @@ export const getAtransactionOfAuser = async(req: Request, res: Response) => {
     }
 }
 
-export const getAlltransactions = async(req: Request, res: Response) => {
+export const getAlltransactions = async(req: Request, res: Response): Promise<void> => {
     try {
         const transactions = await prisma.payment.findMany({
             include: {
@@ -104,7 +104,7 @@ export const getAlltransactions = async(req: Request, res: Response) => {
     }
 }
 
-export const deletetransaction = async(req: Request, res: Response) => {
+export const deletetransaction = async(req: Request, res: Response): Promise<void> => {
     try {
         const transactions = await prisma.payment.delete({
            where: {
