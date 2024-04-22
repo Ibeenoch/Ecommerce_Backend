@@ -22,9 +22,9 @@ model Product {
   discountPercentage    Int
   rating                Int?         
   stock                 Int
-  brand                 Brand?       @relation(fields: [brandId], references: [id], onUpdate: Cascade)
+  brand                 Brand?       @relation(fields: [brandId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   brandId               Int?
-  category              Category?    @relation(fields: [categoryId], references: [id], onUpdate: Cascade)
+  category              Category?    @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   categoryId            Int?
   thumbnail             Json
   keywords              String?
@@ -52,9 +52,9 @@ model ProductReview{
   id            Int         @id @default(autoincrement())
   remark        String
   rating        Int
-  product       Product     @relation(fields: [productId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId     Int
-  user          User        @relation(fields: [userId], references: [id])
+  user          User        @relation(fields: [userId], references: [id] , onDelete: Cascade)
   userId        Int
   createdAt             DateTime    @default(now())
   updatedAt             DateTime    @updatedAt
@@ -92,7 +92,7 @@ model Order {
   id                    Int         @id @default(autoincrement())
   productDetails        Json
   shippingDetails        Json?
-  user                  User        @relation(fields: [userId], references: [id])
+  user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId                Int 
   status                Status?     @default(PENDING)
   payment               Payment[]
@@ -160,9 +160,9 @@ model Payment{
   id              Int          @id @default(autoincrement())
   paymentDetails  Json
   status          PaymentStatus
-  user            User?               @relation(fields: [userId], references: [id])
+  user            User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId          Int?
-  order           Order?               @relation(fields: [orderId], references: [id])
+  order           Order?               @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId         Int? 
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt

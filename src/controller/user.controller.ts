@@ -334,6 +334,30 @@ export const getAUser = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const getOtherUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log("adddd");
+    console.log("aghhjaj, ", req.params);
+    const aUser = await prisma.user.findUnique({
+      where: {
+        id: parseInt(req.params.id),
+      },
+      include: {
+        Order: true,
+        payment: true,
+      },
+    });
+    const token = generateToken(aUser?.id);
+
+    const user = { ...aUser, token };
+    console.log("dhadddd");
+    res.status(200).type("json").send(json(user));
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error });
+  }
+};
+
 export const getAllUser = async (
   req: Request,
   res: Response

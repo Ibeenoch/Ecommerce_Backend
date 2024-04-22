@@ -157,16 +157,18 @@ export const updateProduct = async (req: Request, res: Response): Promise<void> 
 };
 
 export const deleteProduct = async (req: Request, res: Response): Promise<void> => {
-  console.log('deleted pro body ', req.body)
+  console.log('deleted pro body ', req.params, typeof req.params.id)
   try {
-
-    const productDeleted = await prisma.product.delete({
+    if(req.params.id){
+        const productDeleted = await prisma.product.delete({
       where: {
         id: parseInt(req.params.id)
       }
     })
     console.log("product deleted:  ");
     res.status(201).json(productDeleted);
+    }
+  
   } catch (error) {
     console.log(error);
     res.status(500).json(error);

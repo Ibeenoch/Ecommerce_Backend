@@ -8,9 +8,9 @@ export const getAllOrder = async(req: Request, res: Response): Promise<void> => 
         const orders = await prisma.order.findMany({
             include: {
                 payment: true,
-            }
+            },
         })
-
+console.log('order send ', orders)
         res.status(200).json(orders)
         
     } catch (error) {
@@ -21,6 +21,7 @@ export const getAllOrder = async(req: Request, res: Response): Promise<void> => 
 
 export const updateOrder = async(req: Request, res: Response): Promise<void> => {
     try {
+        console.log('received ')
         const orders = await prisma.order.update({
             where: {
                 id: parseInt(req.params.id)
@@ -33,7 +34,7 @@ export const updateOrder = async(req: Request, res: Response): Promise<void> => 
             }
         })
 
-        console.log('result update', )
+        console.log('result update', orders )
 
         res.status(200).json(orders)
         

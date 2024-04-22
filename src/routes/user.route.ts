@@ -1,5 +1,5 @@
 import express from 'express';
-import { changePassword, checkOutInfo, deleteAUser, getAUser, getAllUser, login, paginateUser, register, sendRecoveryPasswordLink, userImage, verifyEmail } from '../controller/user.controller';
+import { changePassword, checkOutInfo, deleteAUser, getAUser, getAllUser, getOtherUser, login, paginateUser, register, sendRecoveryPasswordLink, userImage, verifyEmail } from '../controller/user.controller';
 import { protect, protectAdmin } from '../middleware/auth.middleware';
 import { imageUploader } from '../middleware/cloudinary';
 import upload from '../middleware/fileMiddleware';
@@ -13,6 +13,7 @@ userRoute.post('/user/sendmail', sendRecoveryPasswordLink)
 userRoute.put('/user/change/password/:id', changePassword)
 userRoute.post('/checkout/info', checkOutInfo)
 userRoute.get('/user/:id', protect, getAUser)
+userRoute.get('/other/:id', protect, getOtherUser)
 userRoute.delete('/user/:id', protectAdmin, deleteAUser)
 userRoute.get('/users', protectAdmin, getAllUser)
 userRoute.post('/user/paginate', protectAdmin, paginateUser)
