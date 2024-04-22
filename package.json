@@ -9,7 +9,8 @@
   "author": "ibewunjo enoch",
   "license": "ISC",
   "prisma": {
-    "seed": "ts-node prisma/seed/seed.ts"
+    "seed": "ts-node prisma/seed/seed.ts",
+    "migrate": "npx prisma migrate dev"
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.556.0",
