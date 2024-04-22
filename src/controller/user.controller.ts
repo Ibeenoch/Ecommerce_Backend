@@ -73,7 +73,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         },
       });
 
-      const link = `http://localhost:3000/verify/email/${newuser.id}`;
+      const link = `https://maven-ecommerce-frontend.onrender.com/${newuser.id}`;
 
       const mailOptions = {
         from: "fredenoch1@gmail.com",
@@ -186,7 +186,7 @@ export const sendRecoveryPasswordLink = async (
       },
     });
 
-    const link = `http://localhost:3000/password/change/${findUser?.id}`;
+    const link = `https://maven-ecommerce-frontend.onrender.com/${findUser?.id}`;
 
     const mailOptions = {
       from: "fredenoch1@gmail.com",
