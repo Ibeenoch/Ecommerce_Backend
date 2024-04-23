@@ -4,7 +4,8 @@
   "description": "ecommerce with nodejs backend",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "nodemon",
+    "migrate": "npx prisma migrate dev"
   },
   "author": "ibewunjo enoch",
   "license": "ISC",
