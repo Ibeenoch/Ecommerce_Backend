@@ -73,7 +73,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         },
       });
 
-      const link = `https://maven-ecommerce-frontend.onrender.com/${newuser.id}`;
+      const link = `https://maven-ecommerce-frontend.onrender.com/verify/email/${newuser.id}`;
 
       const mailOptions = {
         from: "fredenoch1@gmail.com",
