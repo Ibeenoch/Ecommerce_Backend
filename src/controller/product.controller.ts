@@ -178,7 +178,7 @@ export const deleteProduct = async (req: Request, res: Response): Promise<void> 
 export const getAllProduct = async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await prisma.product.findMany({
-      take: 16,
+      take: 15,
       include: {
         brand: true,
         category: true,
