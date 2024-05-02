@@ -7,6 +7,7 @@ import brandRoute from './routes/brand.route';
 import userRoute from './routes/user.route';
 import paymentRoute from './routes/payment.route';
 import orderRoute from './routes/order.route';
+import axios from 'axios';
 dotenv.config();
 
 const app = express();
@@ -14,6 +15,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
+
+const pingServer = async () => {
+    try {
+        const response = await axios.get('https://maven-ecommerce-frontend.onrender.com')
+        console.log('ping response ', response.data)
+    } catch (error) {
+        console.log('error pinging')
+    }
+};
+
+const intervalExec = setInterval(pingServer, 60 * 1000);
 
 app.use('/', productRouter)
 app.use('/', categoryRoute)     
