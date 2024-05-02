@@ -16,17 +16,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
-const pingServer = async () => {
-    try {
-        const response = await axios.get('https://maven-ecommerce-frontend.onrender.com')
-        console.log('ping response ', response.data)
-    } catch (error) {
-        console.log('error pinging')
-    }
-};
-
-const intervalExec = setInterval(pingServer, 60 * 1000);
-
 app.use('/', productRouter)
 app.use('/', categoryRoute)     
 app.use('/', orderRoute)     
