@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import { imageUploader } from "../middleware/cloudinary";
-import { PrismaClient } from "@prisma/client";
-import json from "./json.serialised";
-const prisma = new PrismaClient();
+import mongoose from "mongoose";
+import { Product } from "../model/product.model";
+import { Brand } from "../model/brand.model";
 
 export const createProduct = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -23,7 +23,7 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
       public_id: imgs[0].public_id,
     };
 
-    const productcreated = await prisma.product.create({
+    const productcreated1 = await prisma.product.create({
       data: {
         title: req.body.title,
         description: req.body.description,
@@ -64,6 +64,17 @@ export const createProduct = async (req: Request, res: Response): Promise<void> 
         category: true,
       },
     } as any);
+
+    const productcreated = await Product.create({
+      title: req.body.title,
+      description: req.body.description,
+      price: parseInt(req.body.price),
+      discountPercentage: parseInt(req.body.discountPercentage),
+      stock: parseInt(req.body.stock),
+
+    })
+
+    
 
     res.status(201).json(productcreated);
   } catch (error) {
@@ -183,7 +194,7 @@ export const getAllProduct = async (req: Request, res: Response): Promise<void> 
         category: true,
       }
     });
-    console.log("all product fetched @ ", (new Date()).toDateString() );
+    // console.log("all product fetched ", product);
     res.status(200).json(product);
   } catch (error) {
     console.log(error);
